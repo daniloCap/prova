@@ -1,0 +1,17 @@
+### stop multiple 'source ~/.bashrc' from adding to path'
+if [ -v ${ORIGINAL_PATH} ]; then
+  export ORIGINAL_PATH=${PATH}
+fi
+
+
+export JAVA_HOME=/usr/lib/jvm/jre-11-openjdk-11.0.14.1.1-1.el7_9.x86_64
+
+export M2_HOME=/usr/lib/mvn/apache-maven-3.8.5
+
+export BOB_HOME=/workspace/bob
+
+export PATH=${JAVA_HOME}/bin:${M2_HOME}/bin:/usr/local/bin/:${ORIGINAL_PATH}
+
+export GO_HOME=/usr/local/go/bin
+
+export PATH=${JAVA_HOME}/bin:${M2_HOME}/bin:${BOB_HOME}:${GO_HOME}:/usr/local/bin:${ORIGINAL_PATH}
