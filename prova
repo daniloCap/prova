@@ -1,17 +1,77 @@
-### stop multiple 'source ~/.bashrc' from adding to path'
-if [ -v ${ORIGINAL_PATH} ]; then
-  export ORIGINAL_PATH=${PATH}
-fi
+/*------------------------------------------------------------------------------
+ *******************************************************************************
+ * COPYRIGHT Ericsson 2019
+ *
+ * The copyright to the computer program(s) herein is the property of
+ * Ericsson Inc. The programs may be used and/or copied only with written
+ * permission from Ericsson Inc. or in accordance with the terms and
+ * conditions stipulated in the agreement/contract under which the
+ * program(s) have been supplied.
+ *******************************************************************************
+ *----------------------------------------------------------------------------*/
+package com.ericsson.oss.sec.keycloak.http
 
 
-export JAVA_HOME=/usr/lib/jvm/jre-11-openjdk-11.0.14.1.1-1.el7_9.x86_64
 
-export M2_HOME=/usr/lib/mvn/apache-maven-3.8.5
+import com.ericsson.oss.sec.EospeApplication
+import com.ericsson.oss.sec.keycloak.config.KeycloakConfiguration
+import com.ericsson.oss.sec.keycloak.resources.KeycloakClientsResource
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.web.client.RestTemplate
+import spock.lang.Specification
+import com.ericsson.oss.sec.keycloak.KeycloakAdminClient
 
-export BOB_HOME=/workspace/bob
+import com.ericsson.oss.sec.keycloak.resources.KeycloakUsersResource
 
-export PATH=${JAVA_HOME}/bin:${M2_HOME}/bin:/usr/local/bin/:${ORIGINAL_PATH}
+import static org.mockito.BDDMockito.given
 
-export GO_HOME=/usr/local/go/bin
 
-export PATH=${JAVA_HOME}/bin:${M2_HOME}/bin:${BOB_HOME}:${GO_HOME}:/usr/local/bin:${ORIGINAL_PATH}
+@SpringBootTest(classes = EospeApplication.class)
+@ActiveProfiles("test")
+class KeycloakAdminClientSpec extends Specification {
+
+    @Autowired
+    private KeycloakAdminClient keycloakAdminClient
+
+    @MockBean
+    private KeycloakConfiguration keycloakConfiguration
+
+    public static final String  REALM = "danilo"
+    public static final String accessToken = "xyz"
+    @Autowired
+    @Qualifier("authorization")
+    private RestTemplate authRestTemplate;
+
+
+    def setup() {
+        given(keycloakConfiguration.getAdminEndpoint(REALM)).willReturn("/auth/admin/realms/Danilo")
+
+
+
+
+    }
+
+    def "test method user OK"() {
+
+        when: "test method users"
+        KeycloakUsersResource keycloakUsersResource = keycloakAdminClient.users(REALM)
+        then: "Authorization request context is updated with refreshed token"
+        keycloakUsersResource != null
+
+    }
+
+
+    def "test method clients OK"() {
+
+        when: "test method users"
+        KeycloakClientsResource keycloakClientsResource = keycloakAdminClient.clients(REALM, accessToken)
+        then: "Authorization request context is updated with refreshed token"
+        keycloakClientsResource != null
+
+    }
+
+}
